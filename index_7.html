@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuestro Espacio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5EEE3;
+    --paper-2:#EFE6D6;
+    --ink:#2A241E;
+    --ink-soft:#6b6154;
+    --pine:#2F4A3E;
+    --pine-light:#3f6353;
+    --clay:#B5583F;
+    --clay-light:#c97a63;
+    --gold:#AD8A4D;
+    --sage:#8FA37F;
+    --card:#FFFCF6;
+    --border: rgba(42,36,30,0.14);
+    --shadow: 0 6px 18px rgba(42,36,30,0.10);
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Manrope', sans-serif;
+    background:
+      radial-gradient(circle at 15% 8%, rgba(173,138,77,0.08), transparent 40%),
+      radial-gradient(circle at 85% 92%, rgba(47,74,62,0.07), transparent 45%),
+      var(--paper);
+    color:var(--ink);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:36px 20px 80px;}
+
+  /* ---------- Gate ---------- */
+  .gate-overlay{
+    position:fixed;inset:0;
+    background:var(--paper);
+    display:flex;align-items:center;justify-content:center;
+    z-index:100;
+    padding:20px;
+  }
+  .gate-box{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:36px 30px;
+    width:100%;max-width:380px;
+    text-align:center;
+    box-shadow:0 20px 50px rgba(0,0,0,0.12);
+    animation:pop .3s ease both;
+  }
+  .gate-box .eyebrow{margin-bottom:6px;}
+  .gate-box h1{
+    font-family:'Fraunces', serif;font-style:italic;font-weight:600;
+    font-size:28px;color:var(--pine);margin:0 0 18px;
+  }
+  .gate-box input{
+    width:100%;padding:12px 14px;border-radius:8px;
+    border:1px solid var(--border);background:var(--paper);
+    font-family:'Manrope', sans-serif;font-size:15px;text-align:center;
+    letter-spacing:.05em;
+  }
+  .gate-box input:focus{outline:2px solid var(--gold);outline-offset:1px;}
+  .gate-box button{
+    margin-top:14px;width:100%;padding:12px;border:none;border-radius:8px;
+    background:var(--pine);color:#fff;font-weight:700;font-size:14px;cursor:pointer;
+  }
+  .gate-box button:hover{opacity:.9;}
+  .gate-error{color:var(--clay);font-size:12.5px;margin-top:10px;min-height:16px;font-family:'Space Mono', monospace;}
+  .app-hidden{display:none;}
+
+  /* ---------- Header ---------- */
+  header.hero{text-align:center;margin-bottom:34px;animation:fadeUp .6s ease both;}
+  .eyebrow{font-family:'Space Mono', monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+  h1.title{font-family:'Fraunces', serif;font-weight:600;font-style:italic;font-size:clamp(34px,6vw,54px);margin:0 0 8px;color:var(--pine);letter-spacing:-0.01em;}
+  .subtitle{color:var(--ink-soft);font-size:15px;max-width:520px;margin:0 auto;line-height:1.5;}
+  .whoami{margin-top:16px;font-family:'Space Mono', monospace;font-size:12px;color:var(--ink-soft);}
+  .whoami button{border:none;background:none;color:var(--clay);cursor:pointer;font-family:'Space Mono', monospace;font-size:12px;text-decoration:underline;padding:0;margin-left:6px;}
+
+  /* ---------- Tabs ---------- */
+  .tabs{display:flex;gap:6px;overflow-x:auto;padding:0 4px;position:relative;z-index:2;}
+  .tab{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:12px 18px 14px;background:var(--paper-2);color:var(--ink-soft);font-family:'Manrope', sans-serif;font-weight:700;font-size:13.5px;border:1px solid var(--border);border-bottom:none;cursor:pointer;clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%);transform: translateY(6px);transition: transform .18s ease, background .18s ease, color .18s ease;white-space:nowrap;}
+  .tab svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6;flex-shrink:0;}
+  .tab:hover{transform:translateY(2px); color:var(--ink);}
+  .tab.active{background:var(--card);color:var(--pine);transform:translateY(0);box-shadow:0 -2px 0 var(--tab-color, var(--pine)) inset;font-weight:800;}
+
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:0 10px 10px 10px;box-shadow:var(--shadow);padding:28px 26px 32px;min-height:340px;animation:fadeIn .35s ease both;}
+  @media (max-width:600px){.panel{padding:20px 16px 26px;border-radius:0 8px 8px 8px;} .tab{padding:10px 12px 12px;font-size:12.5px;}}
+
+  /* ---------- Grid & cards ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;}
+  .card{position:relative;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 16px 14px;box-shadow:0 3px 10px rgba(42,36,30,0.08);transform:rotate(var(--rot,0deg));transition: transform .18s ease, box-shadow .18s ease;}
+  .card:hover{transform:rotate(0deg) translateY(-3px);box-shadow:0 10px 22px rgba(42,36,30,0.14);}
+  .card .tape{position:absolute;top:-8px;left:22px;width:46px;height:16px;background:rgba(173,138,77,0.35);border:1px solid rgba(173,138,77,0.25);transform:rotate(-3deg);}
+  .card h3{font-family:'Fraunces', serif;font-weight:600;font-size:18px;margin:6px 0 2px;color:var(--ink);line-height:1.25;}
+  .card .type{font-size:12.5px;font-weight:700;color:var(--clay);margin-bottom:6px;}
+  .card .price{font-family:'Space Mono', monospace;font-size:12px;color:var(--pine);margin-bottom:6px;}
+  .card .notes{font-size:13.5px;color:var(--ink-soft);line-height:1.5;white-space:pre-wrap;}
+  .card a.link{display:inline-block;margin-top:8px;font-size:12.5px;color:var(--pine);word-break:break-all;}
+  .card .footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px dashed var(--border);}
+  .avatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono', monospace;font-size:10px;font-weight:700;color:#fff;background:var(--pine);flex-shrink:0;}
+  .footer .meta{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-soft);font-family:'Space Mono', monospace;}
+  .del-btn{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:50%;border:none;background:transparent;color:var(--ink-soft);cursor:pointer;font-size:15px;line-height:1;opacity:0;transition:opacity .15s ease, background .15s ease, color .15s ease;}
+  .card:hover .del-btn{opacity:1;}
+  .del-btn:hover{background:rgba(181,88,63,0.12);color:var(--clay);}
+
+  .add-card{border:2px dashed var(--border);background:transparent;border-radius:10px;display:flex;align-items:center;justify-content:center;min-height:120px;cursor:pointer;color:var(--ink-soft);font-weight:700;font-size:14px;transition: border-color .15s ease, color .15s ease, background .15s ease;}
+  .add-card:hover{border-color:var(--gold); color:var(--gold); background:rgba(173,138,77,0.06);}
+
+  .empty{grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--ink-soft);}
+  .empty .icon-wrap{width:52px;height:52px;margin:0 auto 14px;border-radius:50%;background:var(--paper-2);display:flex;align-items:center;justify-content:center;}
+  .empty .icon-wrap svg{width:24px;height:24px;stroke:var(--gold);fill:none;stroke-width:1.5;}
+  .empty p{margin:0;font-size:14px;}
+
+  .overlay{position:fixed;inset:0;background:rgba(42,36,30,0.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:20px;animation:fadeIn .2s ease both;}
+  .modal{background:var(--card);border-radius:16px;padding:28px 26px;width:100%;max-width:440px;box-shadow:0 20px 50px rgba(0,0,0,0.25);animation:pop .25s ease both;max-height:88vh;overflow-y:auto;}
+  .modal h2{font-family:'Fraunces', serif;font-style:italic;font-weight:600;font-size:24px;margin:0 0 4px;color:var(--pine);}
+  .modal .modal-sub{font-size:13px;color:var(--ink-soft);margin-bottom:18px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
+  .field input, .field textarea, .field select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Manrope', sans-serif;font-size:14px;background:var(--paper);color:var(--ink);resize:vertical;}
+  .field input:focus, .field textarea:focus, .field select:focus{outline:2px solid var(--gold);outline-offset:1px;}
+  .modal-actions{display:flex;gap:10px;margin-top:20px;}
+  .btn{flex:1;padding:11px 14px;border-radius:8px;border:none;font-family:'Manrope', sans-serif;font-weight:700;font-size:13.5px;cursor:pointer;transition: opacity .15s ease, transform .15s ease;}
+  .btn:active{transform:scale(.98);}
+  .btn-primary{background:var(--pine);color:#fff;}
+  .btn-primary:hover{opacity:.9;}
+  .btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--border);}
+  .btn-ghost:hover{background:var(--paper-2);}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes pop{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
+  @media (prefers-reduced-motion: reduce){*{animation:none !important; transition:none !important;}}
+
+  footer.note{text-align:center;margin-top:36px;font-family:'Space Mono', monospace;font-size:11px;color:var(--ink-soft);opacity:.8;}
+</style>
+</head>
+<body>
+
+<!-- ============ PANTALLA DE CONTRASEÑA ============ -->
+<div class="gate-overlay" id="gate-overlay">
+  <div class="gate-box">
+    <div class="eyebrow">acceso privado</div>
+    <h1>Nuestro Espacio</h1>
+    <input type="password" id="gate-input" placeholder="Contraseña" autocomplete="off" />
+    <button id="gate-btn">Entrar</button>
+    <div class="gate-error" id="gate-error"></div>
+  </div>
+</div>
+
+<!-- ============ APP (oculta hasta poner la contraseña) ============ -->
+<div class="wrap app-hidden" id="app-root">
+  <header class="hero">
+    <div class="eyebrow">un espacio para los dos</div>
+    <h1 class="title">Nuestro Espacio</h1>
+    <p class="subtitle">Lugares por conocer, restaurantes por probar, canciones, ideas para la casa y todo lo que estamos construyendo para la boda — en un solo lugar.</p>
+    <div class="whoami" id="whoami"></div>
+  </header>
+
+  <nav class="tabs" id="tabs"></nav>
+  <section class="panel" id="panel"></section>
+
+  <footer class="note">hecho con cariño · lo que agreguen aquí lo ve el otro también 💛</footer>
+</div>
+
+<div id="modal-root"></div>
+
+<script type="module">
+/* =========================================================
+   1) CONTRASEÑA — cámbiala aquí por la que ustedes quieran.
+   Esto es una barrera simple para que no entre cualquiera con
+   el link, no es seguridad de nivel bancario.
+   ========================================================= */
+const SITE_PASSWORD = "MikeYNovia2026";
+
+/* =========================================================
+   2) FIREBASE — pega aquí tu configuración (ver INSTRUCCIONES.md)
+   ========================================================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_PROYECTO.firebaseapp.com",
+  projectId: "TU_PROYECTO",
+  storageBucket: "TU_PROYECTO.appspot.com",
+  messagingSenderId: "TU_SENDER_ID",
+  appId: "TU_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* ---------------- Gate logic ---------------- */
+const gateOverlay = document.getElementById('gate-overlay');
+const gateInput = document.getElementById('gate-input');
+const gateBtn = document.getElementById('gate-btn');
+const gateError = document.getElementById('gate-error');
+const appRoot = document.getElementById('app-root');
+
+function tryUnlock(){
+  if(gateInput.value === SITE_PASSWORD){
+    localStorage.setItem('ne-unlocked', '1');
+    gateOverlay.style.display = 'none';
+    appRoot.classList.remove('app-hidden');
+    boot();
+  } else {
+    gateError.textContent = 'Contraseña incorrecta, inténtalo de nuevo.';
+    gateInput.value = '';
+    gateInput.focus();
+  }
+}
+gateBtn.addEventListener('click', tryUnlock);
+gateInput.addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
+
+if(localStorage.getItem('ne-unlocked') === '1'){
+  gateOverlay.style.display = 'none';
+  appRoot.classList.remove('app-hidden');
+  boot();
+} else {
+  gateInput.focus();
+}
+
+/* ---------------- Icons ---------------- */
+const ICONS = {
+  lugares: `<path d="M12 2C8.4 2 5.5 4.9 5.5 8.5c0 5.2 6.5 12.6 6.5 12.6s6.5-7.4 6.5-12.6C18.5 4.9 15.6 2 12 2z"/><circle cx="12" cy="8.5" r="2.4"/>`,
+  comida: `<path d="M7 2v7c0 1.1.9 2 2 2v11"/><path d="M5 2v6M9 2v6"/><path d="M17 2c-1.7 0-3 1.8-3 5s1.3 5 3 5v10"/>`,
+  musica: `<circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/><path d="M9 18V5.5L20 3v10.5"/>`,
+  boda: `<circle cx="9" cy="14" r="5.2"/><circle cx="15.5" cy="14" r="5.2"/>`,
+  ideas: `<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.5.4.8 1 .8 1.7v.5h5.6v-.5c0-.7.3-1.3.8-1.7A6 6 0 0 0 12 3z"/>`,
+  mobiliario: `<path d="M5 12V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v5"/><path d="M4 12h16v5a1 1 0 0 1-1 1h-1v2h-2v-2H8v2H6v-2H5a1 1 0 0 1-1-1v-5z"/><path d="M6 12V9M18 12V9"/>`
+};
+function icon(key){ return `<svg viewBox="0 0 24 24">${ICONS[key]}</svg>`; }
+
+/* ---------------- Category config ---------------- */
+const CATEGORIES = [
+  { key:'lugares', label:'Lugares', color:'var(--pine)', empty:'Aún no han guardado lugares. ¿A dónde quieren ir juntos?',
+    fields:[
+      {name:'title', label:'¿A dónde?', required:true, placeholder:'Ej. Valle de Bravo'},
+      {name:'link', label:'Link (opcional)', placeholder:'https://...'},
+      {name:'notes', label:'Notas', type:'textarea', placeholder:'¿Por qué quieren ir? ¿Cuándo?'}
+    ]},
+  { key:'comida', label:'Restaurantes', color:'var(--clay)', empty:'Ni un restaurante guardado todavía. ¿Dónde quieren comer pronto?',
+    fields:[
+      {name:'title', label:'Nombre del lugar', required:true, placeholder:'Ej. Rosetta'},
+      {name:'type', label:'Tipo de comida', placeholder:'Ej. Italiana, tacos, sushi...'},
+      {name:'notes', label:'Notas', type:'textarea', placeholder:'¿Qué platillo quieren probar?'}
+    ]},
+  { key:'musica', label:'Música', color:'var(--gold)', empty:'Todavía no hay canciones guardadas. Empiecen su playlist.',
+    fields:[
+      {name:'title', label:'Canción o playlist', required:true, placeholder:'Ej. Perfect'},
+      {name:'type', label:'Artista', placeholder:'Ej. Ed Sheeran'},
+      {name:'notes', label:'Notas', type:'textarea', placeholder:'¿Para qué momento? ¿Nuestra canción, la boda...?'}
+    ]},
+  { key:'boda', label:'Nuestra boda', color:'var(--clay)', empty:'La sección de la boda está lista para llenarse de ideas.',
+    fields:[
+      {name:'title', label:'Idea o pendiente', required:true, placeholder:'Ej. Centro de mesa con velas'},
+      {name:'type', label:'Categoría', type:'select', options:['Decoración','Vestido / Traje','Lugar','Comida','Música','Invitados','Fotografía','Otro']},
+      {name:'notes', label:'Notas', type:'textarea'}
+    ]},
+  { key:'ideas', label:'Ideas', color:'var(--sage)', empty:'Cuando se les ocurra algo, aunque sea una locura, se guarda aquí.',
+    fields:[
+      {name:'title', label:'Idea', required:true},
+      {name:'notes', label:'Descripción', type:'textarea'}
+    ]},
+  { key:'mobiliario', label:'Para la casa', color:'var(--pine)', empty:'Guarden aquí los muebles u objetos que les gustaron para la casa.',
+    fields:[
+      {name:'title', label:'Mueble u objeto', required:true, placeholder:'Ej. Sillón gris de 2 plazas'},
+      {name:'type', label:'¿Dónde lo vieron?', placeholder:'Tienda, link, Marketplace...'},
+      {name:'price', label:'Precio aprox.', placeholder:'Ej. $4,500'},
+      {name:'notes', label:'Notas', type:'textarea'}
+    ]}
+];
+
+/* ---------------- State ---------------- */
+let activeTab = CATEGORIES[0].key;
+let cache = {};
+let myName = localStorage.getItem('ne-my-name') || null;
+let booted = false;
+
+function escapeHtml(str){ return (str||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function initials(name){ if(!name) return '?'; const p = name.trim().split(/\s+/); return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase(); }
+function hashRot(id){ let h=0; for(let i=0;i<id.length;i++) h=(h*31+id.charCodeAt(i))>>>0; return ((h%7)-3)*0.55; }
+function fmtDate(ts){ const d = new Date(ts); return d.toLocaleDateString('es-MX', {day:'numeric', month:'short'}); }
+
+/* ---------------- Firestore data ---------------- */
+async function loadItems(catKey){
+  const snap = await getDocs(collection(db, 'items_' + catKey));
+  const items = [];
+  snap.forEach(d => items.push({ id: d.id, ...d.data() }));
+  items.sort((a,b) => (b.createdAt||0) - (a.createdAt||0));
+  cache[catKey] = items;
+  return items;
+}
+async function addItem(catKey, item){
+  await addDoc(collection(db, 'items_' + catKey), item);
+}
+async function removeItem(catKey, id){
+  await deleteDoc(doc(db, 'items_' + catKey, id));
+}
+
+/* ---------------- Name ---------------- */
+function renderWhoami(){
+  const el = document.getElementById('whoami');
+  if(myName){
+    el.innerHTML = `Estás guardando como <strong style="color:var(--pine)">${escapeHtml(myName)}</strong> <button id="change-name-btn">cambiar</button>`;
+    document.getElementById('change-name-btn').onclick = openNameModal;
+  } else { el.innerHTML = ''; }
+}
+function saveName(name){ myName = name; localStorage.setItem('ne-my-name', name); renderWhoami(); }
+function openNameModal(){
+  const root = document.getElementById('modal-root');
+  root.innerHTML = `
+    <div class="overlay" id="name-overlay">
+      <div class="modal">
+        <h2>¿Quién eres tú?</h2>
+        <p class="modal-sub">Así sabremos quién agregó cada cosa. Solo se guarda en este dispositivo.</p>
+        <div class="field"><label>Tu nombre</label><input type="text" id="name-input" placeholder="Ej. Miguel" maxlength="30" /></div>
+        <div class="modal-actions"><button class="btn btn-primary" id="name-save-btn">Guardar</button></div>
+      </div>
+    </div>`;
+  const input = document.getElementById('name-input');
+  input.focus();
+  const submit = ()=>{ const val = input.value.trim(); if(!val){ input.focus(); return; } saveName(val); root.innerHTML=''; };
+  document.getElementById('name-save-btn').onclick = submit;
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter') submit(); });
+}
+
+/* ---------------- Tabs ---------------- */
+function renderTabs(){
+  const el = document.getElementById('tabs');
+  el.innerHTML = CATEGORIES.map(cat => `
+    <button class="tab ${cat.key===activeTab?'active':''}" data-key="${cat.key}" style="--tab-color:${cat.color}">
+      ${icon(cat.key)}<span>${cat.label}</span>
+    </button>`).join('');
+  el.querySelectorAll('.tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ activeTab = btn.dataset.key; renderTabs(); renderPanel(); });
+  });
+}
+
+/* ---------------- Panel ---------------- */
+async function renderPanel(){
+  const cat = CATEGORIES.find(c=>c.key===activeTab);
+  const panel = document.getElementById('panel');
+  panel.innerHTML = `<div class="grid"><div class="empty"><p>Cargando…</p></div></div>`;
+  let items = [];
+  try{ items = await loadItems(cat.key); }
+  catch(e){ panel.innerHTML = `<div class="grid"><div class="empty"><p>No se pudo conectar. Revisa la configuración de Firebase en el archivo.</p></div></div>`; return; }
+
+  let cardsHtml = items.length === 0
+    ? `<div class="empty"><div class="icon-wrap">${icon(cat.key)}</div><p>${cat.empty}</p></div>`
+    : items.map(item => renderCard(cat, item)).join('');
+
+  panel.innerHTML = `<div class="grid">${cardsHtml}<div class="add-card" id="add-card-btn">+ Agregar a ${cat.label.toLowerCase()}</div></div>`;
+  document.getElementById('add-card-btn').addEventListener('click', ()=> openItemModal(cat));
+  panel.querySelectorAll('.del-btn').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      e.stopPropagation();
+      btn.disabled = true;
+      await removeItem(cat.key, btn.dataset.id);
+      renderPanel();
+    });
+  });
+}
+
+function renderCard(cat, item){
+  const rot = hashRot(item.id);
+  const typeLine = item.type ? `<div class="type">${escapeHtml(item.type)}</div>` : '';
+  const priceLine = item.price ? `<div class="price">${escapeHtml(item.price)}</div>` : '';
+  const notesLine = item.notes ? `<div class="notes">${escapeHtml(item.notes)}</div>` : '';
+  const linkLine = item.link ? `<a class="link" href="${escapeHtml(item.link)}" target="_blank" rel="noopener">${escapeHtml(item.link)}</a>` : '';
+  return `
+    <div class="card" style="--rot:${rot}deg">
+      <div class="tape"></div>
+      <button class="del-btn" data-id="${item.id}" title="Eliminar">×</button>
+      <h3>${escapeHtml(item.title)}</h3>
+      ${typeLine}${priceLine}${notesLine}${linkLine}
+      <div class="footer">
+        <div class="meta">${fmtDate(item.createdAt)}</div>
+        <div class="avatar" title="${escapeHtml(item.addedBy||'')}">${initials(item.addedBy)}</div>
+      </div>
+    </div>`;
+}
+
+/* ---------------- Add item modal ---------------- */
+function openItemModal(cat){
+  const root = document.getElementById('modal-root');
+  const fieldsHtml = cat.fields.map(f=>{
+    if(f.type==='textarea') return `<div class="field"><label>${f.label}</label><textarea name="${f.name}" rows="3" placeholder="${f.placeholder||''}"></textarea></div>`;
+    if(f.type==='select'){ const opts = f.options.map(o=>`<option value="${o}">${o}</option>`).join(''); return `<div class="field"><label>${f.label}</label><select name="${f.name}"><option value="">Selecciona…</option>${opts}</select></div>`; }
+    return `<div class="field"><label>${f.label}${f.required?' *':''}</label><input type="text" name="${f.name}" placeholder="${f.placeholder||''}" /></div>`;
+  }).join('');
+
+  root.innerHTML = `
+    <div class="overlay" id="item-overlay">
+      <div class="modal">
+        <h2>Agregar a ${cat.label.toLowerCase()}</h2>
+        <p class="modal-sub">Guardando como <strong>${escapeHtml(myName||'ustedes')}</strong>${myName?'':' — <span style="cursor:pointer;text-decoration:underline;color:var(--clay)" id="set-name-inline">poner mi nombre</span>'}</p>
+        <form id="item-form">
+          ${fieldsHtml}
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" id="item-cancel-btn">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>`;
+
+  const overlay = document.getElementById('item-overlay');
+  overlay.addEventListener('click', (e)=>{ if(e.target===overlay) root.innerHTML=''; });
+  document.getElementById('item-cancel-btn').onclick = ()=> root.innerHTML='';
+  const setNameInline = document.getElementById('set-name-inline');
+  if(setNameInline) setNameInline.onclick = openNameModal;
+
+  const form = document.getElementById('item-form');
+  const firstInput = form.querySelector('input,select,textarea');
+  if(firstInput) firstInput.focus();
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const fd = new FormData(form);
+    const item = { createdAt: Date.now(), addedBy: myName || 'Alguien' };
+    let missingRequired = false;
+    cat.fields.forEach(f=>{
+      const val = (fd.get(f.name)||'').toString().trim();
+      if(f.required && !val) missingRequired = true;
+      if(val) item[f.name] = val;
+    });
+    if(missingRequired || !item.title){ form.querySelector('[name="title"]').focus(); return; }
+    const submitBtn = form.querySelector('.btn-primary');
+    submitBtn.disabled = true; submitBtn.textContent = 'Guardando…';
+    try{
+      await addItem(cat.key, item);
+      root.innerHTML = '';
+      renderPanel();
+    }catch(err){
+      submitBtn.disabled = false; submitBtn.textContent = 'Guardar';
+      alert('No se pudo guardar. Revisa tu conexión o la configuración de Firebase.');
+    }
+  });
+}
+
+/* ---------------- Boot ---------------- */
+function boot(){
+  if(booted) return;
+  booted = true;
+  renderWhoami();
+  renderTabs();
+  renderPanel();
+  if(!myName) openNameModal();
+}
+</script>
+</body>
+</html>
